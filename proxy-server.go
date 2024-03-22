@@ -35,17 +35,51 @@ type ResponseInfo struct {
 	StatusCode   int                 `json:"status_code"`
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	jsonData, err := os.ReadFile("hosts.config.json")
+func fileExists(filename string) bool {
+	_, err := os.Stat(filename)
+	return !os.IsNotExist(err)
+}
+
+func saveFile(filename string, data []byte) error {
+	err := os.WriteFile(filename, data, 0644)
 	if err != nil {
-		fmt.Println("Error reading JSON file:", err)
-		return
+		fmt.Println("Error writing file:", err)
+		return err
 	}
 
-	var configs []Config
-	err = json.Unmarshal(jsonData, &configs)
+	return nil
+}
+
+func readFile(filename string) ([]byte, error) {
+	data, err := os.ReadFile(filename)
 	if err != nil {
-		fmt.Println("Error unmarshalling JSON:", err)
+		fmt.Println("Error reading file:", err)
+		return nil, err
+	}
+	return data, nil
+}
+
+func readJSONFile(filename string, v interface{}) ([]byte, error) {
+	data, err := readFile(filename)
+	if err != nil {
+		fmt.Println("Error reading JSON file:", err)
+		return data, err
+	}
+
+	err = json.Unmarshal(data, v)
+	if err != nil {
+		fmt.Println("Error unmarshal JSON file:", err)
+		return data, err
+	}
+
+	return data, nil
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	var configs []Config
+	_, err := readJSONFile("hosts.config.json", &configs)
+	if err != nil {
+		fmt.Println("Error reading JSON file:", err)
 		return
 	}
 
@@ -82,31 +116,44 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 
 	if useMock {
-		durationMock := time.Since(start)
-		responseFile, _ := os.ReadFile(responseFilename)
-		if len(responseFile) > 0 {
+		fileExists := fileExists(responseFilename)
+		if fileExists {
 			var responseFileInfo ResponseInfo
-			err := json.Unmarshal(responseFile, &responseFileInfo)
+			responseFile, err := readJSONFile(responseFilename, &responseFileInfo)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("Error reading mock: %v", err), http.StatusInternalServerError)
 				return
 			}
 
-			fmt.Println("Reading from mockfile duration", durationMock)
-			responseFileJSON, _ := json.Marshal(responseFileInfo.Body)
+			if len(responseFile) > 0 {
+				durationMock := time.Since(start)
+				fmt.Println("Reading from mockfile duration", durationMock)
 
-			if responseFileInfo.StatusCode >= 400 {
-				http.Error(w, string(responseFileJSON), responseFileInfo.StatusCode)
+				responseFileJSON, _ := json.Marshal(responseFileInfo.Body)
+
+				if responseFileInfo.StatusCode >= 400 {
+					http.Error(w, string(responseFileJSON), responseFileInfo.StatusCode)
+					return
+				}
+
+				w.Header().Set("Content-Type", "application/json")
+				w.Write(responseFileJSON)
 				return
 			}
-
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(responseFileJSON)
-			return
 		}
 	}
 
-	resp, err := http.Get(url)
+	var resp *http.Response
+
+	if r.Method == "GET" {
+		resp, err = http.Get(url)
+	}
+
+	if r.Method == "POST" {
+		resp, err = http.Post(url, "application/json", r.Body)
+	}
+
+	resp, err = http.Get(url)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error making request to endpoint: %v", err), http.StatusInternalServerError)
 		return
@@ -138,11 +185,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = os.WriteFile(responseFilename, responseInfoJSON, 0644)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error writing response to file: %v", err), http.StatusInternalServerError)
-		return
-	}
+	saveFile(responseFilename, responseInfoJSON)
 	fmt.Println("Response saved to", responseFilename)
 
 	requestInfo := RequestInfo{
@@ -161,7 +204,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	requestFilename := fmt.Sprintf("request_%s.json", strings.ReplaceAll(url, "/", "-"))
 	requestFilename = strings.ReplaceAll(requestFilename, ":", "-")
 
-	err = os.WriteFile(requestFilename, requestInfoJSON, 0644)
+	err = saveFile(requestFilename, requestInfoJSON)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error writing request info to file: %v", err), http.StatusInternalServerError)
 		return
