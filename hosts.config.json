@@ -1,0 +1,7 @@
+[
+  {
+    "host": "https://viacep.com.br",
+    "enabled": true,
+    "use_mock": true
+  }
+]
