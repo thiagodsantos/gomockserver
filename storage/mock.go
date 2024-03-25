@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/thiagodsantos/gomockserver/constants"
 	"github.com/thiagodsantos/gomockserver/structs"
 	"github.com/thiagodsantos/gomockserver/utils"
 )
@@ -11,7 +12,7 @@ import (
 // Get mock response from file
 func GetMockResponse(url string) ([]byte, int, error) {
 	// Format filename with prefix and URL
-	responseFilename := utils.FormatFilename("response", url)
+	responseFilename := utils.FormatFilename(constants.ResponseFileName, url)
 
 	// Check if file exists in current directory
 	fileExists := utils.FileExists(responseFilename)

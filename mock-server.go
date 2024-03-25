@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -9,10 +10,17 @@ import (
 	"github.com/thiagodsantos/gomockserver/config"
 	"github.com/thiagodsantos/gomockserver/constants"
 	"github.com/thiagodsantos/gomockserver/storage"
+	"github.com/thiagodsantos/gomockserver/utils"
 )
 
 // Handler function to handle requests
 func handler(w http.ResponseWriter, r *http.Request) {
+	requestBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Erro ao ler o corpo da solicitação", http.StatusInternalServerError)
+		return
+	}
+
 	// Get host config from hosts.config.json
 	config, err := config.GetHostConfig()
 	if err != nil {
@@ -47,7 +55,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 		// Return mock response
 		if responseFileJSON != nil {
-			w.Header().Set("Content-Type", constants.JSONContentType)
+			w.Header().Set(constants.HeaderContentType, constants.JSONContentType)
 			w.Write(responseFileJSON)
 			return
 		}
@@ -73,7 +81,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	duration := time.Since(start)
 
 	// Save request info to file
-	err = storage.SaveRequest(url, r, duration.String())
+	err = storage.SaveRequest(url, r, duration.String(), requestBody)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error saving request info: %v", err), http.StatusInternalServerError)
 		return
@@ -93,13 +101,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return response from endpoint
-	w.Header().Set("Content-Type", constants.JSONContentType)
+	w.Header().Set(constants.HeaderContentType, constants.JSONContentType)
 	w.Write(responseBody)
 }
 
 func main() {
 	// Start server
 	http.HandleFunc("/", handler)
-	fmt.Println("Server running on", constants.ProxyServerPort)
+	fmt.Println(utils.Format(utils.PURPLE, "Mock server running on "+constants.ProxyServerPort+"\n"))
 	http.ListenAndServe(constants.ProxyServerPort, nil)
 }

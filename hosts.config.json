@@ -1,6 +1,11 @@
 [
   {
     "host": "https://viacep.com.br",
+    "enabled": false,
+    "use_mock": true
+  },
+  {
+    "host": "https://6648ca0b932f4dabbc41ebd811f04ab1.api.mockbin.io",
     "enabled": true,
     "use_mock": true
   }

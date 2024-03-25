@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/thiagodsantos/gomockserver/constants"
 	"github.com/thiagodsantos/gomockserver/structs"
 	"github.com/thiagodsantos/gomockserver/utils"
 )
@@ -19,11 +20,17 @@ func SaveResponse(url string, response *http.Response, responseTime string) (str
 		return structs.Response{}, nil, err
 	}
 
+	// Check if response content type is JSON
+	if response.Header.Get(constants.HeaderContentType) != constants.JSONContentType {
+		fmt.Println("Response content type allows only JSON format")
+		return structs.Response{}, nil, nil
+	}
+
 	// Decode response body to JSON format
 	body := map[string]interface{}{}
 	json.Unmarshal(responseBody, &body)
 
-	responseInfo := structs.Response{
+	responseData := structs.Response{
 		URL:          url,
 		Method:       response.Request.Method,
 		Headers:      response.Header,
@@ -33,21 +40,22 @@ func SaveResponse(url string, response *http.Response, responseTime string) (str
 	}
 
 	// Encode response info to JSON format
-	responseInfoJSON, err := json.MarshalIndent(responseInfo, "", "  ")
+	responseJSON, err := json.MarshalIndent(responseData, "", "  ")
 	if err != nil {
 		fmt.Println("Error encoding response info to JSON:", err)
 		return structs.Response{}, nil, err
 	}
 
-	responseFilename := utils.FormatFilename("response", url)
+	responseFilename := utils.FormatFilename(constants.ResponseFileName, url)
 
 	// Save response info to file
-	err = utils.SaveFile(responseFilename, responseInfoJSON)
+	err = utils.SaveFile(responseFilename, responseJSON)
 	if err != nil {
 		fmt.Println("Error writing response info to file:", err)
 		return structs.Response{}, nil, err
 	}
-	fmt.Println("Response info saved to", responseFilename)
+	//fmt.Println("Response info saved to", responseFilename)
+	fmt.Println(utils.Format(utils.BLUE, "Response info saved to "+responseFilename))
 
-	return responseInfo, responseBody, nil
+	return responseData, responseBody, nil
 }

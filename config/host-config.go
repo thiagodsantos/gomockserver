@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 
+	"github.com/thiagodsantos/gomockserver/constants"
 	"github.com/thiagodsantos/gomockserver/structs"
 	"github.com/thiagodsantos/gomockserver/utils"
 )
@@ -12,7 +13,7 @@ func GetHostConfig() (structs.Config, error) {
 	var configs []structs.Config
 
 	// Read JSON file data from hosts.config.json
-	_, err := utils.ReadJSONFile("hosts.config.json", &configs)
+	_, err := utils.ReadJSONFile(constants.HostsConfigFileName, &configs)
 	if err != nil {
 		fmt.Println("Error reading JSON file:", err)
 		return structs.Config{}, err
