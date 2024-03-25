@@ -9,23 +9,8 @@ import (
 	"os"
 	"strings"
 	"time"
-)
 
-// Server constants
-const (
-	ProxyServerPort = ":8080"
-)
-
-// HTTP constants
-const (
-	MethodGet  = "GET"
-	MethodPost = "POST"
-)
-
-// JSON constants
-const (
-	JSONExtension   = "json"
-	JSONContentType = "application/json"
+	"github.com/thiagodsantos/gomockserver/constants"
 )
 
 // Config struct from hosts.config.json
@@ -84,12 +69,14 @@ func readFile(filename string) ([]byte, error) {
 
 // Read JSON file data from file
 func readJSONFile(filename string, v interface{}) ([]byte, error) {
+	// Read file data
 	data, err := readFile(filename)
 	if err != nil {
 		fmt.Println("Error reading JSON file:", err)
 		return data, err
 	}
 
+	// Parse JSON data
 	err = json.Unmarshal(data, v)
 	if err != nil {
 		fmt.Println("Error unmarshal JSON file:", err)
@@ -101,7 +88,8 @@ func readJSONFile(filename string, v interface{}) ([]byte, error) {
 
 // Format filename with prefix and URL
 func formatFilename(prefix string, url string) string {
-	filename := fmt.Sprintf("%s_%s.%s", prefix, strings.ReplaceAll(url, "/", "-"), JSONExtension)
+	// Replace / and : with -
+	filename := fmt.Sprintf("%s_%s.%s", prefix, strings.ReplaceAll(url, "/", "-"), constants.JSONExtension)
 	filename = strings.ReplaceAll(filename, ":", "-")
 
 	return filename
@@ -110,12 +98,15 @@ func formatFilename(prefix string, url string) string {
 // Get host config from hosts.config.json
 func getHostConfig() (Config, error) {
 	var configs []Config
+
+	// Read JSON file data from hosts.config.json
 	_, err := readJSONFile("hosts.config.json", &configs)
 	if err != nil {
 		fmt.Println("Error reading JSON file:", err)
 		return Config{}, err
 	}
 
+	// Get host config enabled
 	var hostCount int
 	var hostConfig Config
 	for _, config := range configs {
@@ -125,6 +116,7 @@ func getHostConfig() (Config, error) {
 		}
 	}
 
+	// Return error if more than one host is enabled
 	if hostCount > 1 {
 		return Config{}, fmt.Errorf("more than one host enabled in hosts.config")
 	}
@@ -142,14 +134,17 @@ func saveRequestInfo(url string, request *http.Request, responseTime string) err
 		ResponseTime: responseTime,
 	}
 
+	// Encode request info to JSON format
 	requestInfoJSON, err := json.MarshalIndent(requestInfo, "", "  ")
 	if err != nil {
 		fmt.Println("Error encoding request info to JSON:", err)
 		return err
 	}
 
+	// Format filename with prefix and URL
 	requestFilename := formatFilename("request", url)
 
+	// Save request info to file
 	err = saveFile(requestFilename, requestInfoJSON)
 	if err != nil {
 		fmt.Println("Error writing request info to file:", err)
@@ -162,12 +157,14 @@ func saveRequestInfo(url string, request *http.Request, responseTime string) err
 
 // Save response info to file
 func saveResponseInfo(url string, response *http.Response, responseTime string) (ResponseInfo, []byte, error) {
+	// Read response body data from response
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println("Error reading response body:", err)
 		return ResponseInfo{}, nil, err
 	}
 
+	// Decode response body to JSON format
 	body := map[string]interface{}{}
 	json.Unmarshal(responseBody, &body)
 
@@ -180,6 +177,7 @@ func saveResponseInfo(url string, response *http.Response, responseTime string) 
 		ResponseTime: responseTime,
 	}
 
+	// Encode response info to JSON format
 	responseInfoJSON, err := json.MarshalIndent(responseInfo, "", "  ")
 	if err != nil {
 		fmt.Println("Error encoding response info to JSON:", err)
@@ -188,6 +186,7 @@ func saveResponseInfo(url string, response *http.Response, responseTime string) 
 
 	responseFilename := formatFilename("response", url)
 
+	// Save response info to file
 	err = saveFile(responseFilename, responseInfoJSON)
 	if err != nil {
 		fmt.Println("Error writing response info to file:", err)
@@ -200,18 +199,22 @@ func saveResponseInfo(url string, response *http.Response, responseTime string) 
 
 // Get mock response from file
 func getMockResponse(url string) ([]byte, int, error) {
+	// Format filename with prefix and URL
 	responseFilename := formatFilename("response", url)
-	fmt.Println("Mock response filename:", responseFilename)
+
+	// Check if file exists in current directory
 	fileExists := fileExists(responseFilename)
 
 	if fileExists {
 		var responseFileInfo ResponseInfo
+		// Read JSON file data from response_<url>.json
 		responseFile, err := readJSONFile(responseFilename, &responseFileInfo)
 		if err != nil {
 			fmt.Println("Error reading mock:", err)
 			return nil, 500, err
 		}
 
+		// Return mock response from file
 		if len(responseFile) > 0 {
 			responseFileJSON, err := json.Marshal(responseFileInfo.Body)
 			if err != nil {
@@ -228,18 +231,14 @@ func getMockResponse(url string) ([]byte, int, error) {
 
 // Handler function to handle requests
 func handler(w http.ResponseWriter, r *http.Request) {
-	/**
-	Get host config
-	*/
+	// Get host config from hosts.config.json
 	config, err := getHostConfig()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error getting host config: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	/**
-	Validate and create URL
-	*/
+	// Create URL from host and path
 	path := r.URL.Path
 	urlParsed, err := url.Parse(config.Host + path)
 	if err != nil {
@@ -250,9 +249,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	url := urlParsed.String()
 
-	/**
-	Return mock response from file
-	*/
+	// Return mock response from file
 	if config.UseMock {
 		responseFileJSON, statusCode, err := getMockResponse(url)
 		if err != nil {
@@ -260,19 +257,15 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		/**
-		Return response when status code is 4xx or 5xx
-		*/
+		// Return response when status code is 4xx or 5xx
 		if statusCode >= 400 {
 			http.Error(w, string(responseFileJSON), statusCode)
 			return
 		}
 
-		/**
-		Return mock response
-		*/
+		// Return mock response
 		if responseFileJSON != nil {
-			w.Header().Set("Content-Type", JSONContentType)
+			w.Header().Set("Content-Type", constants.JSONContentType)
 			w.Write(responseFileJSON)
 			return
 		}
@@ -280,20 +273,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	var resp *http.Response
 
-	/**
-	Make request to endpoint
-	*/
-	if r.Method == MethodGet {
+	// Make request to endpoint
+	if r.Method == constants.MethodGet {
 		resp, err = http.Get(url)
 	}
 
-	if r.Method == MethodPost {
-		resp, err = http.Post(url, JSONContentType, r.Body)
+	if r.Method == constants.MethodPost {
+		resp, err = http.Post(url, constants.JSONContentType, r.Body)
 	}
 
-	/**
-	Return error when request fails
-	*/
+	// Return error when request fails
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error making request to endpoint: %v", err), http.StatusInternalServerError)
 		return
@@ -301,44 +290,34 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 	duration := time.Since(start)
 
-	/**
-	Save request info to file
-	*/
+	// Save request info to file
 	err = saveRequestInfo(url, r, duration.String())
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error saving request info: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	/**
-	Save response info to file
-	*/
+	// Save response info to file
 	responseInfo, responseBody, err := saveResponseInfo(url, resp, duration.String())
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error saving response info: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	/**
-	Return response when status code is 4xx or 5xx
-	*/
+	// Return response when status code is 4xx or 5xx
 	if responseInfo.StatusCode >= 400 {
 		http.Error(w, string(responseBody), responseInfo.StatusCode)
 		return
 	}
 
-	/**
-	Return response from endpoint
-	*/
-	w.Header().Set("Content-Type", JSONContentType)
+	// Return response from endpoint
+	w.Header().Set("Content-Type", constants.JSONContentType)
 	w.Write(responseBody)
 }
 
 func main() {
-	/**
-	Start server
-	*/
+	// Start server
 	http.HandleFunc("/", handler)
-	fmt.Println("Server running on", ProxyServerPort)
-	http.ListenAndServe(ProxyServerPort, nil)
+	fmt.Println("Server running on", constants.ProxyServerPort)
+	http.ListenAndServe(constants.ProxyServerPort, nil)
 }
