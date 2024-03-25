@@ -1,7 +1,7 @@
 package structs
 
-// Config struct from hosts.config.json
-type Config struct {
+// HostConfig struct from hosts.config.json
+type HostConfig struct {
 	Host    string   `json:"host"`
 	Paths   []string `json:"paths"`
 	Enabled bool     `json:"enabled"`

@@ -2,7 +2,7 @@ package constants
 
 // Server constants
 const (
-	ProxyServerPort = ":8080"
+	ProxyServerPort = 8080
 )
 
 // HTTP constants
@@ -23,7 +23,8 @@ const (
 
 // File name constants
 const (
-	HostsConfigFileName = "hosts.config.json"
-	ResponseFileName    = "response"
-	RequestFileName     = "request"
+	HostsConfigFileName  = "hosts.config.json"
+	ServerConfigFileName = "server.config.json"
+	ResponseFileName     = "response"
+	RequestFileName      = "request"
 )

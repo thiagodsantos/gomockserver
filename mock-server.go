@@ -106,8 +106,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// Get server config
+	serverConfig, _ := config.GetServerConfig()
+	port := fmt.Sprintf(":%d", serverConfig.Port)
+
 	// Start server
-	http.HandleFunc("/", handler)
-	fmt.Println(utils.Format(utils.PURPLE, "Mock server running on "+constants.ProxyServerPort+"\n"))
-	http.ListenAndServe(constants.ProxyServerPort, nil)
+	http.HandleFunc(serverConfig.Path, handler)
+	fmt.Println(utils.Format(utils.PURPLE, "Mock server running on "+port+"\n"))
+	http.ListenAndServe(port, nil)
 }

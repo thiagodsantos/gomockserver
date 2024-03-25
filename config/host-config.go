@@ -9,19 +9,19 @@ import (
 )
 
 // Get host config from hosts.config.json
-func GetHostConfig() (structs.Config, error) {
-	var configs []structs.Config
+func GetHostConfig() (structs.HostConfig, error) {
+	var configs []structs.HostConfig
 
 	// Read JSON file data from hosts.config.json
 	_, err := utils.ReadJSONFile(constants.HostsConfigFileName, &configs)
 	if err != nil {
-		fmt.Println("Error reading JSON file:", err)
-		return structs.Config{}, err
+		fmt.Printf("Error reading JSON file %s", constants.HostsConfigFileName)
+		return structs.HostConfig{}, err
 	}
 
 	// Get host config enabled
 	var hostCount int
-	var hostConfig structs.Config
+	var hostConfig structs.HostConfig
 	for _, config := range configs {
 		if config.Enabled {
 			hostConfig = config
@@ -31,7 +31,7 @@ func GetHostConfig() (structs.Config, error) {
 
 	// Return error if more than one host is enabled
 	if hostCount > 1 {
-		return structs.Config{}, fmt.Errorf("more than one host enabled in hosts.config")
+		return structs.HostConfig{}, fmt.Errorf("more than one host enabled in hosts.config")
 	}
 
 	return hostConfig, nil
