@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/thiagodsantos/gomockserver/constants"
 	"github.com/thiagodsantos/gomockserver/structs"
@@ -21,7 +22,7 @@ func SaveResponse(url string, response *http.Response, responseTime string) (str
 	}
 
 	// Check if response content type is JSON
-	if response.Header.Get(constants.HeaderContentType) != constants.JSONContentType {
+	if !strings.Contains(response.Header.Get(constants.HeaderContentType), constants.JSONContentType) {
 		fmt.Println("Response content type allows only JSON format")
 		return structs.Response{}, nil, nil
 	}
