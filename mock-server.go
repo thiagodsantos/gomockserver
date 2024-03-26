@@ -17,7 +17,7 @@ import (
 func handler(w http.ResponseWriter, r *http.Request) {
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Erro ao ler o corpo da solicitação", http.StatusInternalServerError)
+		http.Error(w, "Error reading request body", http.StatusInternalServerError)
 		return
 	}
 

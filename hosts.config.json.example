@@ -1,0 +1,7 @@
+[
+  {
+    "host": "https://api.quotable.io",
+    "enabled": true,
+    "use_mock": true
+  }
+]
