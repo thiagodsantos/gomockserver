@@ -12,6 +12,10 @@ import (
 func GetHostConfig() (structs.HostConfig, error) {
 	var configs []structs.HostConfig
 
+	if !utils.FileExists(constants.HostsConfigFileName) {
+		return structs.HostConfig{}, fmt.Errorf("file %s not found", constants.HostsConfigFileName)
+	}
+
 	// Read JSON file data from hosts.config.json
 	_, err := utils.ReadJSONFile(constants.HostsConfigFileName, &configs)
 	if err != nil {

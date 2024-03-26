@@ -11,6 +11,10 @@ import (
 func GetServerConfig() (structs.ServerConfig, error) {
 	var configs structs.ServerConfig
 
+	if !utils.FileExists(constants.ServerConfigFileName) {
+		return structs.ServerConfig{}, fmt.Errorf("file %s not found", constants.ServerConfigFileName)
+	}
+
 	_, err := utils.ReadJSONFile(constants.ServerConfigFileName, &configs)
 	if err != nil {
 		fmt.Printf("Error reading JSON file %s", constants.ServerConfigFileName)
