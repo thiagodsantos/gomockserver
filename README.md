@@ -60,3 +60,7 @@ When a request is made:
 ## Mock responses
 
 When modifying the response file (created by mock server), the mock server will return the modified response, including status codes for error (4xx and 5xx).
+
+## TODO
+
+- [ ] GraphQL Support
