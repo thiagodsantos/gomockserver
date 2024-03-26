@@ -19,8 +19,7 @@ func GetHostConfig() (structs.HostConfig, error) {
 	// Read JSON file data from hosts.config.json
 	_, err := utils.ReadJSONFile(constants.HostsConfigFileName, &configs)
 	if err != nil {
-		fmt.Printf("Error reading JSON file %s", constants.HostsConfigFileName)
-		return structs.HostConfig{}, err
+		return structs.HostConfig{}, fmt.Errorf("error reading JSON file %s", constants.HostsConfigFileName)
 	}
 
 	// Get host config enabled

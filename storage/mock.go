@@ -15,9 +15,7 @@ func GetMockResponse(url string) ([]byte, int, error) {
 	responseFilename := utils.FormatFilename(constants.ResponseFileName, url)
 
 	// Check if file exists in current directory
-	fileExists := utils.FileExists(responseFilename)
-
-	if !fileExists {
+	if !utils.FileExists(responseFilename) {
 		return defaultResponse()
 	}
 

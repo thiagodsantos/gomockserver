@@ -12,7 +12,8 @@ func GetServerConfig() (structs.ServerConfig, error) {
 	var configs structs.ServerConfig
 
 	if !utils.FileExists(constants.ServerConfigFileName) {
-		return structs.ServerConfig{}, fmt.Errorf("file %s not found", constants.ServerConfigFileName)
+		fmt.Printf("file %s not found", constants.ServerConfigFileName)
+		panic(1)
 	}
 
 	_, err := utils.ReadJSONFile(constants.ServerConfigFileName, &configs)
