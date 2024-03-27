@@ -39,12 +39,14 @@ At the root of the project, there should be two configuration files:
 
 *hosts.config.json*
 ```json
-[{
-  "host": "https://api.quotable.io",
-  "enabled": true,
-  "use_mock": true,
-  "generate_path": "/generate-files"
-}]
+[
+  {
+    "host": "https://api.quotable.io",
+    "enabled": true,
+    "use_mock": true,
+    "generate_path": "/generate-files"
+  }
+]
 ```
 - **host**: URL of the destination host's API
 - **enabled**: Enables and utilizes the host for requests
