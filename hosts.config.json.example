@@ -2,6 +2,7 @@
   {
     "host": "https://api.quotable.io",
     "enabled": true,
-    "use_mock": true
+    "use_mock": true,
+    "generate_path": "/generate-files"
   }
 ]
