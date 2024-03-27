@@ -88,15 +88,15 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Save response info to file
-	responseInfo, responseBody, err := storage.SaveResponse(url, resp, duration.String())
+	responseData, responseBody, err := storage.SaveResponse(url, resp, duration.String())
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error saving response info: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	// Return response when status code is 4xx or 5xx
-	if responseInfo.StatusCode >= 400 {
-		http.Error(w, string(responseBody), responseInfo.StatusCode)
+	if responseData.StatusCode >= 400 {
+		http.Error(w, string(responseBody), responseData.StatusCode)
 		return
 	}
 
