@@ -42,12 +42,14 @@ At the root of the project, there should be two configuration files:
 [{
   "host": "https://api.quotable.io",
   "enabled": true,
-  "use_mock": true
+  "use_mock": true,
+  "generate_path": "/generate-files"
 }]
 ```
 - **host**: URL of the destination host's API
 - **enabled**: Enables and utilizes the host for requests
 - **use_mock**: Enables the use of mocks using files generated via mock server
+- **generate_path**: Path to generate empty request and response files 
 
 **Note**: The mock server supports only one enabled host. If more than one host is enabled, an error is thrown
 
@@ -65,6 +67,6 @@ When modifying the response file (created by mock server), the mock server will 
 
 - [ ] GraphQL Support
 - [ ] Generate blank file
-  - [ ] HTTP
+  - [x] HTTP
   - [ ] CLI
 - [ ] How it works in README
