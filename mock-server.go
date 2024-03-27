@@ -64,6 +64,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if request is for generating empty files
 	if strings.HasPrefix(r.URL.Path, config.GeneratePath) {
 		handlerGenerate(w, r)
 		return
@@ -146,7 +147,26 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 }
 
+func setup() {
+	// Generate empty server config file
+	err := storage.GenerateEmptyServerConfigFile()
+	if err != nil {
+		fmt.Println("Error generating empty server config file:", err)
+		return
+	}
+
+	// Generate empty hosts config file
+	err = storage.GenerateEmptyHostsConfigFile()
+	if err != nil {
+		fmt.Println("Error generating empty hosts config file:", err)
+		return
+	}
+}
+
 func main() {
+	// Setup
+	setup()
+
 	// Get server config
 	serverConfig, _ := config.GetServerConfig()
 	port := fmt.Sprintf(":%d", serverConfig.Port)
