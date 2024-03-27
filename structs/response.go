@@ -1,6 +1,6 @@
 package structs
 
-// Response struct to save response info to file in JSON format with filename response_<url>.json
+// Response sSruct to save response to file in JSON format with filename response_<url>.json
 type Response struct {
 	URL          string              `json:"url"`
 	Method       string              `json:"method"`

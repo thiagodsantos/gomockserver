@@ -23,3 +23,21 @@ func ReadJSONFile(filename string, v interface{}) ([]byte, error) {
 
 	return data, nil
 }
+
+func SaveJSONFile(filename string, v interface{}) error {
+	// Encode JSON data
+	data, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		fmt.Println("Error encoding JSON data:", err)
+		return err
+	}
+
+	// Save JSON data to file
+	err = SaveFile(filename, data)
+	if err != nil {
+		fmt.Println("Error writing JSON data to file:", err)
+		return err
+	}
+
+	return nil
+}

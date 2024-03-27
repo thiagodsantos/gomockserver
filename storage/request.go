@@ -10,7 +10,7 @@ import (
 	"github.com/thiagodsantos/gomockserver/utils"
 )
 
-// Save request info to file in JSON format with filename request_<url>.json
+// Save request to file in JSON format with filename request_<url>.json
 func SaveRequest(url string, request *http.Request, responseTime string, requestBody []byte) error {
 	// Decode response body to JSON format
 	body := map[string]interface{}{}
@@ -24,23 +24,35 @@ func SaveRequest(url string, request *http.Request, responseTime string, request
 		ResponseTime: responseTime,
 	}
 
-	// Encode request info to JSON format
-	requestJSON, err := json.MarshalIndent(requestData, "", "  ")
-	if err != nil {
-		fmt.Println("Error encoding request info to JSON:", err)
-		return err
-	}
-
-	// Format filename with prefix and URL
 	requestFilename := utils.FormatFilename(constants.RequestFileName, url)
 
-	// Save request info to file
-	err = utils.SaveFile(requestFilename, requestJSON)
+	err := utils.SaveJSONFile(requestFilename, requestData)
 	if err != nil {
-		fmt.Println("Error writing request info to file:", err)
+		fmt.Println("Error saving request to file:", err)
 		return err
 	}
-	fmt.Println(utils.Format(utils.GREEN, "Request info saved to "+requestFilename))
+	fmt.Println(utils.Format(utils.GREEN, "Request saved to "+requestFilename))
+
+	return nil
+}
+
+func GenerateEmptyRequestFile(url string) error {
+	requestData := structs.Request{
+		URL:          url,
+		Method:       "",
+		Headers:      nil,
+		Body:         map[string]interface{}{},
+		ResponseTime: "",
+	}
+
+	requestFilename := utils.FormatFilename(constants.RequestFileName, url)
+
+	err := utils.SaveJSONFile(requestFilename, requestData)
+	if err != nil {
+		fmt.Println("Error saving request to file:", err)
+		return err
+	}
+	fmt.Println(utils.Format(utils.GREEN, "Request saved to "+requestFilename))
 
 	return nil
 }

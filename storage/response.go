@@ -12,7 +12,7 @@ import (
 	"github.com/thiagodsantos/gomockserver/utils"
 )
 
-// Save response info to file
+// Save response to file
 func SaveResponse(url string, response *http.Response, responseTime string) (structs.Response, []byte, error) {
 	// Read response body data from response
 	responseBody, err := io.ReadAll(response.Body)
@@ -40,23 +40,35 @@ func SaveResponse(url string, response *http.Response, responseTime string) (str
 		ResponseTime: responseTime,
 	}
 
-	// Encode response info to JSON format
-	responseJSON, err := json.MarshalIndent(responseData, "", "  ")
-	if err != nil {
-		fmt.Println("Error encoding response info to JSON:", err)
-		return structs.Response{}, nil, err
-	}
-
 	responseFilename := utils.FormatFilename(constants.ResponseFileName, url)
 
-	// Save response info to file
-	err = utils.SaveFile(responseFilename, responseJSON)
+	err = utils.SaveJSONFile(responseFilename, responseData)
 	if err != nil {
-		fmt.Println("Error writing response info to file:", err)
+		fmt.Println("Error saving response to file:", err)
 		return structs.Response{}, nil, err
 	}
-	//fmt.Println("Response info saved to", responseFilename)
-	fmt.Println(utils.Format(utils.BLUE, "Response info saved to "+responseFilename))
+	fmt.Println(utils.Format(utils.BLUE, "Response saved to "+responseFilename))
 
 	return responseData, responseBody, nil
+}
+
+func GenerateEmptyResponseFile(url string) error {
+	responseData := structs.Response{
+		URL:          url,
+		Method:       "",
+		Headers:      nil,
+		Body:         map[string]interface{}{},
+		StatusCode:   0,
+		ResponseTime: "",
+	}
+	responseFilename := utils.FormatFilename(constants.ResponseFileName, url)
+
+	err := utils.SaveJSONFile(responseFilename, responseData)
+	if err != nil {
+		fmt.Println("Error saving empty response to file:", err)
+		return err
+	}
+	fmt.Println(utils.Format(utils.BLUE, "Response saved to "+responseFilename))
+
+	return nil
 }

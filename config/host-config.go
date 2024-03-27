@@ -37,5 +37,9 @@ func GetHostConfig() (structs.HostConfig, error) {
 		return structs.HostConfig{}, fmt.Errorf("more than one host enabled in hosts.config")
 	}
 
+	if hostConfig.GeneratePath == "" {
+		hostConfig.GeneratePath = constants.DefaultGeneratePath
+	}
+
 	return hostConfig, nil
 }

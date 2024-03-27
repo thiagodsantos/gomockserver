@@ -2,7 +2,8 @@ package constants
 
 // Server constants
 const (
-	ProxyServerPort = 8080
+	ProxyServerPort     = 8080
+	DefaultGeneratePath = "/generate"
 )
 
 // HTTP constants

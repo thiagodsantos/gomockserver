@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/thiagodsantos/gomockserver/config"
@@ -12,6 +13,41 @@ import (
 	"github.com/thiagodsantos/gomockserver/storage"
 	"github.com/thiagodsantos/gomockserver/utils"
 )
+
+func handlerGenerate(w http.ResponseWriter, r *http.Request) {
+	// Get host config from hosts.config.json
+	config, err := config.GetHostConfig()
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error getting host config: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Create URL from host and path
+	path := r.URL.Path
+	urlParsed, err := url.Parse(config.Host + path)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error parsing URL: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	url := urlParsed.String()
+
+	// Generate empty request file
+	err = storage.GenerateEmptyRequestFile(url)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error generating empty request file: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Generate empty response file
+	err = storage.GenerateEmptyResponseFile(url)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error generating empty response file: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte("Empty request and response files generated"))
+}
 
 // Handler function to handle requests
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -25,6 +61,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	config, err := config.GetHostConfig()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error getting host config: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	if strings.HasPrefix(r.URL.Path, config.GeneratePath) {
+		handlerGenerate(w, r)
 		return
 	}
 
@@ -80,17 +121,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 	duration := time.Since(start)
 
-	// Save request info to file
+	// Save request to file
 	err = storage.SaveRequest(url, r, duration.String(), requestBody)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error saving request info: %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Error saving request: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	// Save response info to file
+	// Save response to file
 	responseData, responseBody, err := storage.SaveResponse(url, resp, duration.String())
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error saving response info: %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Error saving response: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -113,5 +154,9 @@ func main() {
 	// Start server
 	http.HandleFunc(serverConfig.Path, handler)
 	fmt.Println(utils.Format(utils.PURPLE, "Mock server running on "+port+"\n"))
-	http.ListenAndServe(port, nil)
+	err := http.ListenAndServe(port, nil)
+	if err != nil {
+		fmt.Println("Error starting server:", err)
+		return
+	}
 }

@@ -19,26 +19,26 @@ func GetMockResponse(url string) ([]byte, int, error) {
 		return defaultResponse()
 	}
 
-	var responseFileInfo structs.Response
+	var response structs.Response
 	// Read JSON file data from response_<url>.json
-	responseFile, err := utils.ReadJSONFile(responseFilename, &responseFileInfo)
+	responseJSON, err := utils.ReadJSONFile(responseFilename, &response)
 	if err != nil {
 		fmt.Println("Error reading mock:", err)
 		return nil, 500, err
 	}
 
-	if len(responseFile) == 0 {
+	if len(responseJSON) == 0 {
 		return defaultResponse()
 	}
 
 	// Return mock response from file
-	responseFileJSON, err := json.MarshalIndent(responseFileInfo.Body, "", "  ")
+	responseFileJSON, err := json.MarshalIndent(response.Body, "", "  ")
 	if err != nil {
 		fmt.Println("Error encoding mock response to JSON:", err)
 		return nil, 500, err
 	}
 
-	return responseFileJSON, responseFileInfo.StatusCode, nil
+	return responseFileJSON, response.StatusCode, nil
 }
 
 func defaultResponse() ([]byte, int, error) {

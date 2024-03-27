@@ -1,6 +1,6 @@
 package structs
 
-// RequestInfo struct to save request info to file in JSON format with filename request_<url>.json
+// Struct to save request to file in JSON format with filename request_<url>.json
 type Request struct {
 	URL          string              `json:"url"`
 	Method       string              `json:"method"`
