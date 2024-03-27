@@ -66,7 +66,5 @@ When modifying the response file (created by mock server), the mock server will 
 ## TODO
 
 - [ ] GraphQL Support
-- [ ] Generate blank file
-  - [x] HTTP
-  - [ ] CLI
+- [x] Generate blank file
 - [ ] How it works in README
