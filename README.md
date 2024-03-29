@@ -70,4 +70,4 @@ When modifying the response file (created by mock server), the mock server will 
 - [x] Generate blank file
 - [ ] How it works in README
 - [ ] GraphQL Support
-- [ ] Docker Support
+- [x] Docker Support
