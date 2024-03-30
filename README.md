@@ -67,6 +67,11 @@ When a request is made:
 - The request is saved in a file at the root. *Ex: request_\<url>.json*
 - The response is saved in a file at the root. *Ex: response_\<url>.json*
 
+### GraphQL
+- The query is saved in a file at the root. *Ex: request_\<url>_query\<MD5>.json*
+- The mutation is saved in a file at the root. *Ex: request_\<url>_mutation\<MD5>.json*
+- The response is saved in a file at the root. *Ex: response_\<url>_query\<MD5>.json*
+
 ## Mock responses
 
 When modifying the response file (created by mock server), the mock server will return the modified response, including status codes for error (4xx and 5xx).
