@@ -41,10 +41,13 @@ At the root of the project, there should be two configuration files:
 ```json
 [
   {
-    "host": "https://api.quotable.io",
+    "url": "https://api.quotable.io",
     "enabled": true,
     "use_mock": true,
-    "generate_path": "/generate-files"
+    "enable_graphql": true,
+    "enable_rest": true,
+    "generate_path": "/generate-files",
+    "graphql_path": "/graphql"
   }
 ]
 ```
