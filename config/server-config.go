@@ -13,15 +13,13 @@ func GetServerConfig() (structs.ServerConfig, error) {
 
 	// Check if server config file exists
 	if !utils.FileExists(constants.ServerConfigFileName) {
-		fmt.Printf("file %s not found", constants.ServerConfigFileName)
-		panic(1)
+		return structs.ServerConfig{}, fmt.Errorf("server config file %s does not exist", constants.ServerConfigFileName)
 	}
 
 	// Read server config file
 	_, err := utils.ReadJSONFile(constants.ServerConfigFileName, &configs)
 	if err != nil {
-		fmt.Printf("Error reading JSON file %s", constants.ServerConfigFileName)
-		panic(err)
+		return structs.ServerConfig{}, fmt.Errorf("error reading server config file: %v", err)
 	}
 
 	// Set default values

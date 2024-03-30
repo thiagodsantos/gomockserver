@@ -12,11 +12,13 @@ func GenerateEmptyServerConfigFile() error {
 		return nil
 	}
 
+	// Generate empty ServerConfig struct
 	serverConfig := structs.ServerConfig{
 		Port: constants.ProxyServerPort,
-		Path: "/",
+		Path: constants.ProxyPath,
 	}
 
+	// Save ServerConfig struct to server.config.json
 	return utils.SaveJSONFile(constants.ServerConfigFileName, serverConfig)
 }
 
@@ -26,7 +28,7 @@ func GenerateEmptyHostsConfigFile() error {
 		return nil
 	}
 
-	// generate empty HostConfig array
+	// Generate empty HostConfig array
 	hostsConfig := []structs.HostConfig{}
 	hostsConfig = append(hostsConfig, structs.HostConfig{
 		Url:          "",
@@ -35,5 +37,6 @@ func GenerateEmptyHostsConfigFile() error {
 		GeneratePath: constants.GeneratePath,
 	})
 
+	// Save HostConfig array to hosts.config.json
 	return utils.SaveJSONFile(constants.HostsConfigFileName, hostsConfig)
 }

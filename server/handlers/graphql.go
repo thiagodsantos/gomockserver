@@ -29,6 +29,20 @@ func GetGraphQLRequestBody(w http.ResponseWriter, r *http.Request, reqBody []byt
 	return &requestBody, err
 }
 
+func GetOperationName(w http.ResponseWriter, r *http.Request, reqBody []byte) (string, error) {
+	requestBody, err := GetGraphQLRequestBody(w, r, reqBody)
+	if err != nil {
+		return "", err
+	}
+
+	operationName, err := requestBody.GetOperationNameHashed()
+	if err != nil {
+		return "", err
+	}
+
+	return operationName, nil
+}
+
 func GraphqlHandler(w http.ResponseWriter, r *http.Request, graphqlUrl string, reqBody []byte) (*http.Response, error) {
 	var err error
 
