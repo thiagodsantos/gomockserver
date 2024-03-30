@@ -1,8 +1,11 @@
 [
   {
-    "host": "https://api.quotable.io",
+    "url": "https://api.quotable.io",
     "enabled": true,
-    "use_mock": true,
-    "generate_path": "/generate-files"
+    "enable_mock": true,
+    "enable_graphql": true,
+    "enable_rest": true,
+    "generate_path": "/generate-files",
+    "graphql_path": "/graphql"
   }
 ]

@@ -2,8 +2,11 @@ package structs
 
 // Host config struct from hosts.config.json
 type HostConfig struct {
-	Host         string `json:"host"`
-	Enabled      bool   `json:"enabled"`
-	UseMock      bool   `json:"use_mock"`
-	GeneratePath string `json:"generate_path"`
+	Url           string `json:"url"`
+	Enabled       bool   `json:"enabled"`
+	EnableMock    bool   `json:"enable_mock"`
+	EnableGraphql bool   `json:"enable_graphql"`
+	EnableREST    bool   `json:"enable_rest"`
+	GeneratePath  string `json:"generate_path"`
+	GraphQLPath   string `json:"graphql_path"`
 }

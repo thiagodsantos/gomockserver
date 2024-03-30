@@ -2,8 +2,9 @@ package constants
 
 // Server constants
 const (
-	ProxyServerPort     = 8080
-	DefaultGeneratePath = "/generate"
+	ProxyPath       = "/"
+	ProxyServerPort = 8080
+	GeneratePath    = "/generate"
 )
 
 // HTTP constants
@@ -12,6 +13,7 @@ const (
 	MethodPost = "POST"
 )
 
+// Header constants
 const (
 	HeaderContentType = "Content-Type"
 )

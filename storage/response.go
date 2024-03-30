@@ -13,7 +13,7 @@ import (
 )
 
 // Save response to file
-func SaveResponse(url string, response *http.Response, responseTime string) (structs.Response, []byte, error) {
+func SaveResponse(url string, response *http.Response, responseTime string, suffix string) (structs.Response, []byte, error) {
 	// Read response body data from response
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -40,7 +40,7 @@ func SaveResponse(url string, response *http.Response, responseTime string) (str
 		ResponseTime: responseTime,
 	}
 
-	responseFilename := utils.FormatFilename(constants.ResponseFileName, url)
+	responseFilename := utils.FormatFilename(constants.ResponseFileName, url+suffix)
 
 	err = utils.SaveJSONFile(responseFilename, responseData)
 	if err != nil {
