@@ -10,9 +10,9 @@ import (
 )
 
 // Get mock response from file
-func GetMockResponse(url string, graphqlName string) ([]byte, int, error) {
+func GetMockResponse(url string, operationName string) ([]byte, int, error) {
 	// Format filename with prefix and URL
-	responseFilename := utils.FormatFilename(constants.ResponseFileName, url)
+	responseFilename := utils.FormatFilename(constants.ResponseFileName, url+operationName)
 
 	// Check if file exists in current directory
 	if !utils.FileExists(responseFilename) {

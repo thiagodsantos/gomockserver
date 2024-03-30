@@ -97,11 +97,25 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		hostURL = urlParsed.String()
 	}
 
+	var operationNameHashed string
+
 	// Return mock response from file
 	if config.UseMock {
-		graphqlName := ""
+		if config.EnableGraphql {
+			graphqlRequestBody, err := server.GetGraphQLRequestBody(w, r, requestBody)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error getting GraphQL request: %v", err), http.StatusInternalServerError)
+				return
+			}
 
-		responseFileJSON, statusCode, err := storage.GetMockResponse(hostURL, graphqlName)
+			operationNameHashed, err = graphqlRequestBody.GetOperationNameHashed()
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error getting operation: %v", err), http.StatusInternalServerError)
+				return
+			}
+		}
+
+		responseFileJSON, statusCode, err := storage.GetMockResponse(hostURL, operationNameHashed)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error getting mock response: %v", err), http.StatusInternalServerError)
 			return
@@ -125,13 +139,15 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	// Make GraphQL request
 	if config.EnableGraphql {
-		resp, err = server.GraphqlHandler(w, r, hostURL)
+		resp, err = server.GraphqlHandler(w, r, hostURL, requestBody)
 	}
 
 	// Make REST request
 	if config.EnableREST {
 		resp, err = server.RESTHandler(w, r, hostURL, requestBody)
 	}
+
+	defer resp.Body.Close()
 
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error making request to endpoint: %v", err), http.StatusInternalServerError)
@@ -141,14 +157,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	duration := time.Since(start)
 
 	// Save request to file
-	err = storage.SaveRequest(hostURL, r, duration.String(), requestBody)
+	err = storage.SaveRequest(hostURL, r, duration.String(), requestBody, operationNameHashed)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error saving request: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	// Save response to file
-	responseData, responseBody, err := storage.SaveResponse(hostURL, resp, duration.String())
+	responseData, responseBody, err := storage.SaveResponse(hostURL, resp, duration.String(), operationNameHashed)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error saving response: %v", err), http.StatusInternalServerError)
 		return

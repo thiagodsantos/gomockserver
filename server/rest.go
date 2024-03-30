@@ -30,7 +30,6 @@ func RESTHandler(w http.ResponseWriter, r *http.Request, url string, requestBody
 		http.Error(w, fmt.Sprintf("Error making request to endpoint: %v", err), http.StatusInternalServerError)
 		return nil, err
 	}
-	defer resp.Body.Close()
 
 	return resp, nil
 }

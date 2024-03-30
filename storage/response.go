@@ -13,15 +13,13 @@ import (
 )
 
 // Save response to file
-func SaveResponse(url string, response *http.Response, responseTime string) (structs.Response, []byte, error) {
+func SaveResponse(url string, response *http.Response, responseTime string, suffix string) (structs.Response, []byte, error) {
 	// Read response body data from response
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println("Error reading response body:", err)
 		return structs.Response{}, nil, err
 	}
-
-	fmt.Printf("Response body: %s\n", responseBody)
 
 	// Check if response content type is JSON
 	if !strings.Contains(response.Header.Get(constants.HeaderContentType), constants.JSONContentType) {
@@ -42,7 +40,7 @@ func SaveResponse(url string, response *http.Response, responseTime string) (str
 		ResponseTime: responseTime,
 	}
 
-	responseFilename := utils.FormatFilename(constants.ResponseFileName, url)
+	responseFilename := utils.FormatFilename(constants.ResponseFileName, url+suffix)
 
 	err = utils.SaveJSONFile(responseFilename, responseData)
 	if err != nil {
