@@ -10,13 +10,14 @@ import (
 
 	"github.com/thiagodsantos/gomockserver/config"
 	"github.com/thiagodsantos/gomockserver/constants"
+	"github.com/thiagodsantos/gomockserver/server"
 	"github.com/thiagodsantos/gomockserver/storage"
 	"github.com/thiagodsantos/gomockserver/utils"
 )
 
 func handlerGenerate(w http.ResponseWriter, r *http.Request) {
-	// Get host config from hosts.config.json
-	config, err := config.GetHostConfig()
+	// Get host hostConfig from hosts.hostConfig.json
+	hostConfig, err := config.GetHostConfig()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error getting host config: %v", err), http.StatusInternalServerError)
 		return
@@ -24,7 +25,7 @@ func handlerGenerate(w http.ResponseWriter, r *http.Request) {
 
 	// Create URL from host and path
 	path := r.URL.Path
-	urlParsed, err := url.Parse(config.Host + path)
+	urlParsed, err := url.Parse(hostConfig.Url + path)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error parsing URL: %v", err), http.StatusInternalServerError)
 		return
@@ -51,6 +52,9 @@ func handlerGenerate(w http.ResponseWriter, r *http.Request) {
 
 // Handler function to handle requests
 func handler(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	// Get body from request
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Error reading request body", http.StatusInternalServerError)
@@ -70,20 +74,34 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create URL from host and path
-	path := r.URL.Path
-	urlParsed, err := url.Parse(config.Host + path)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error parsing URL: %v", err), http.StatusInternalServerError)
-		return
+	start := time.Now()
+
+	var hostURL string
+
+	if config.EnableGraphql {
+		urlGraphQL, err := url.Parse(config.Url + config.GraphQLPath)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error parsing GraphQL URL: %v", err), http.StatusInternalServerError)
+			return
+		}
+		hostURL = urlGraphQL.String()
 	}
 
-	start := time.Now()
-	url := urlParsed.String()
+	if config.EnableREST {
+		path := r.URL.Path
+		urlParsed, err := url.Parse(config.Url + path)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error parsing URL: %v", err), http.StatusInternalServerError)
+			return
+		}
+		hostURL = urlParsed.String()
+	}
 
 	// Return mock response from file
 	if config.UseMock {
-		responseFileJSON, statusCode, err := storage.GetMockResponse(url)
+		graphqlName := ""
+
+		responseFileJSON, statusCode, err := storage.GetMockResponse(hostURL, graphqlName)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error getting mock response: %v", err), http.StatusInternalServerError)
 			return
@@ -105,32 +123,32 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	var resp *http.Response
 
-	// Make request to endpoint
-	if r.Method == constants.MethodGet {
-		resp, err = http.Get(url)
+	// Make GraphQL request
+	if config.EnableGraphql {
+		resp, err = server.GraphqlHandler(w, r, hostURL)
 	}
 
-	if r.Method == constants.MethodPost {
-		resp, err = http.Post(url, constants.JSONContentType, r.Body)
+	// Make REST request
+	if config.EnableREST {
+		resp, err = server.RESTHandler(w, r, hostURL, requestBody)
 	}
 
-	// Return error when request fails
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error making request to endpoint: %v", err), http.StatusInternalServerError)
 		return
 	}
-	defer resp.Body.Close()
+
 	duration := time.Since(start)
 
 	// Save request to file
-	err = storage.SaveRequest(url, r, duration.String(), requestBody)
+	err = storage.SaveRequest(hostURL, r, duration.String(), requestBody)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error saving request: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	// Save response to file
-	responseData, responseBody, err := storage.SaveResponse(url, resp, duration.String())
+	responseData, responseBody, err := storage.SaveResponse(hostURL, resp, duration.String())
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error saving response: %v", err), http.StatusInternalServerError)
 		return
@@ -180,3 +198,10 @@ func main() {
 		return
 	}
 }
+
+/**
+
+http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+	server.GraphqlHandler(w, r, "https://api.spacex.land/graphql/")
+})
+*/

@@ -21,6 +21,8 @@ func SaveResponse(url string, response *http.Response, responseTime string) (str
 		return structs.Response{}, nil, err
 	}
 
+	fmt.Printf("Response body: %s\n", responseBody)
+
 	// Check if response content type is JSON
 	if !strings.Contains(response.Header.Get(constants.HeaderContentType), constants.JSONContentType) {
 		fmt.Println("Response content type allows only JSON format")

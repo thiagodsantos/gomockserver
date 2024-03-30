@@ -10,7 +10,7 @@ import (
 )
 
 // Get mock response from file
-func GetMockResponse(url string) ([]byte, int, error) {
+func GetMockResponse(url string, graphqlName string) ([]byte, int, error) {
 	// Format filename with prefix and URL
 	responseFilename := utils.FormatFilename(constants.ResponseFileName, url)
 

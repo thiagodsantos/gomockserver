@@ -38,7 +38,7 @@ func GetHostConfig() (structs.HostConfig, error) {
 	}
 
 	if hostConfig.GeneratePath == "" {
-		hostConfig.GeneratePath = constants.DefaultGeneratePath
+		hostConfig.GeneratePath = constants.GeneratePath
 	}
 
 	return hostConfig, nil

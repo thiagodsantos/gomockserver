@@ -29,10 +29,10 @@ func GenerateEmptyHostsConfigFile() error {
 	// generate empty HostConfig array
 	hostsConfig := []structs.HostConfig{}
 	hostsConfig = append(hostsConfig, structs.HostConfig{
-		Host:         "",
+		Url:          "",
 		Enabled:      false,
 		UseMock:      false,
-		GeneratePath: constants.DefaultGeneratePath,
+		GeneratePath: constants.GeneratePath,
 	})
 
 	return utils.SaveJSONFile(constants.HostsConfigFileName, hostsConfig)
