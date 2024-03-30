@@ -63,7 +63,7 @@ At the root of the project, there should be two configuration files:
 
 ## Output Files
 
-When a request is made:
+### REST
 - The request is saved in a file at the root. *Ex: request_\<url>.json*
 - The response is saved in a file at the root. *Ex: response_\<url>.json*
 
