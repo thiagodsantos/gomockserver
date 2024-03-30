@@ -43,7 +43,7 @@ At the root of the project, there should be two configuration files:
   {
     "url": "https://api.quotable.io",
     "enabled": true,
-    "use_mock": true,
+    "enable_mock": true,
     "enable_graphql": true,
     "enable_rest": true,
     "generate_path": "/generate-files",
@@ -71,6 +71,7 @@ When modifying the response file (created by mock server), the mock server will 
 ## TODO
 
 - [x] Generate blank file
+- [x] GraphQL Support ![Beta](https://img.shields.io/badge/-Beta-orange)
+- [x] Docker Support ![Beta](https://img.shields.io/badge/-Beta-orange)
+- [ ] Request and response files in output folder (in server.cofig or by host.config)
 - [ ] How it works in README
-- [ ] GraphQL Support
-- [x] Docker Support

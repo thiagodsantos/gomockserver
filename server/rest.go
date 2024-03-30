@@ -20,6 +20,7 @@ func RESTHandler(w http.ResponseWriter, r *http.Request, url string, requestBody
 		resp, err = http.Post(url, constants.JSONContentType, r.Body)
 	}
 
+	// Only allow GET and POST requests
 	if r.Method != constants.MethodGet && r.Method != constants.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return nil, err

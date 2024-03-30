@@ -2,7 +2,7 @@
   {
     "url": "https://api.quotable.io",
     "enabled": true,
-    "use_mock": true,
+    "enable_mock": true,
     "enable_graphql": true,
     "enable_rest": true,
     "generate_path": "/generate-files",

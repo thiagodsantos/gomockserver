@@ -31,7 +31,7 @@ func GenerateEmptyHostsConfigFile() error {
 	hostsConfig = append(hostsConfig, structs.HostConfig{
 		Url:          "",
 		Enabled:      false,
-		UseMock:      false,
+		EnableMock:   false,
 		GeneratePath: constants.GeneratePath,
 	})
 

@@ -12,6 +12,7 @@ import (
 func GetHostConfig() (structs.HostConfig, error) {
 	var configs []structs.HostConfig
 
+	// Check if hosts.config.json exists
 	if !utils.FileExists(constants.HostsConfigFileName) {
 		return structs.HostConfig{}, fmt.Errorf("file %s not found", constants.HostsConfigFileName)
 	}
@@ -37,6 +38,12 @@ func GetHostConfig() (structs.HostConfig, error) {
 		return structs.HostConfig{}, fmt.Errorf("more than one host enabled in hosts.config")
 	}
 
+	// Return error if no host is enabled
+	if hostCount == 0 {
+		return structs.HostConfig{}, fmt.Errorf("no host enabled in hosts.config")
+	}
+
+	// Set default values
 	if hostConfig.GeneratePath == "" {
 		hostConfig.GeneratePath = constants.GeneratePath
 	}

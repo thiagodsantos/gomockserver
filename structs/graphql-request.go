@@ -1,31 +1,36 @@
 package structs
 
 import (
-	"crypto/sha256"
+	"crypto/md5"
 	"encoding/hex"
 	"fmt"
 )
 
+// GraphQLRequest struct based on the request body
 type GraphQLRequest struct {
 	Query    string `json:"query"`
 	Mutation string `json:"mutation"`
 }
 
 func (g *GraphQLRequest) GetOperationNameHashed() (string, error) {
+	// Returns query identifier
 	if g.Query != "" {
-		return "query_" + compressOperaionName(g.Query), nil
+		return "query_" + hashOperationName(g.Query), nil
 	}
 
+	// Returns mutation identifier
 	if g.Mutation != "" {
-		return "mutation_" + compressOperaionName(g.Mutation), nil
+		return "mutation_" + hashOperationName(g.Mutation), nil
 	}
 
 	return "", fmt.Errorf("no operation found")
 }
 
-func compressOperaionName(operationName string) string {
-	hash := sha256.Sum256([]byte(operationName))
+func hashOperationName(operationName string) string {
+	// Hash operation name using MD5
+	hash := md5.Sum([]byte(operationName))
 
+	// Convert hash to string
 	hashedString := hex.EncodeToString(hash[:])
 
 	return hashedString

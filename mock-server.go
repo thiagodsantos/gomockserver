@@ -100,7 +100,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	var operationNameHashed string
 
 	// Return mock response from file
-	if config.UseMock {
+	if config.EnableMock {
 		if config.EnableGraphql {
 			graphqlRequestBody, err := server.GetGraphQLRequestBody(w, r, requestBody)
 			if err != nil {

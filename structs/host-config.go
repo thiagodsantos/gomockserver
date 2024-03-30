@@ -4,7 +4,7 @@ package structs
 type HostConfig struct {
 	Url           string `json:"url"`
 	Enabled       bool   `json:"enabled"`
-	UseMock       bool   `json:"use_mock"`
+	EnableMock    bool   `json:"enable_mock"`
 	EnableGraphql bool   `json:"enable_graphql"`
 	EnableREST    bool   `json:"enable_rest"`
 	GeneratePath  string `json:"generate_path"`
