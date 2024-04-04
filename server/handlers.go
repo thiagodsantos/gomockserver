@@ -28,14 +28,14 @@ func handlerGenerate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate empty request file
-	err = storage.GenerateEmptyRequestFile(url)
+	err = storage.GenerateEmptyRequestFile(url, hostConfig.OutputFolder)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error generating empty request file: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	// Generate empty response file
-	err = storage.GenerateEmptyResponseFile(url)
+	err = storage.GenerateEmptyResponseFile(url, hostConfig.OutputFolder)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error generating empty response file: %v", err), http.StatusInternalServerError)
 		return
@@ -125,14 +125,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	duration := time.Since(start)
 
 	// Save request to file
-	err = storage.SaveRequest(hostURL, r, duration.String(), requestBody, operationName)
+	err = storage.SaveRequest(hostURL, r, duration.String(), requestBody, operationName, config.OutputFolder)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error saving request: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	// Save response to file
-	responseData, responseBody, err := storage.SaveResponse(hostURL, resp, duration.String(), operationName)
+	responseData, responseBody, err := storage.SaveResponse(hostURL, resp, duration.String(), operationName, config.OutputFolder)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error saving response: %v", err), http.StatusInternalServerError)
 		return

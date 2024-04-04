@@ -11,7 +11,7 @@ import (
 )
 
 // Save request to file in JSON format with filename request_<url>.json
-func SaveRequest(url string, request *http.Request, responseTime string, requestBody []byte, suffix string) error {
+func SaveRequest(url string, request *http.Request, responseTime string, requestBody []byte, suffix string, folder string) error {
 	// Decode response body to JSON format
 	body := map[string]interface{}{}
 	json.Unmarshal(requestBody, &body)
@@ -26,7 +26,7 @@ func SaveRequest(url string, request *http.Request, responseTime string, request
 
 	requestFilename := utils.FormatFilename(constants.RequestFileName, url+suffix)
 
-	err := utils.SaveJSONFile(requestFilename, requestData)
+	err := utils.SaveJSONFile(folder, requestFilename, requestData)
 	if err != nil {
 		fmt.Println("Error saving request to file:", err)
 		return err
@@ -36,7 +36,7 @@ func SaveRequest(url string, request *http.Request, responseTime string, request
 	return nil
 }
 
-func GenerateEmptyRequestFile(url string) error {
+func GenerateEmptyRequestFile(url string, folder string) error {
 	requestData := structs.Request{
 		URL:          url,
 		Method:       "",
@@ -47,7 +47,7 @@ func GenerateEmptyRequestFile(url string) error {
 
 	requestFilename := utils.FormatFilename(constants.RequestFileName, url)
 
-	err := utils.SaveJSONFile(requestFilename, requestData)
+	err := utils.SaveJSONFile(folder, requestFilename, requestData)
 	if err != nil {
 		fmt.Println("Error saving request to file:", err)
 		return err

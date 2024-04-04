@@ -19,7 +19,7 @@ func GenerateEmptyServerConfigFile() error {
 	}
 
 	// Save ServerConfig struct to server.config.json
-	return utils.SaveJSONFile(constants.ServerConfigFileName, serverConfig)
+	return utils.SaveJSONFile("", constants.ServerConfigFileName, serverConfig)
 }
 
 func GenerateEmptyHostsConfigFile() error {
@@ -38,5 +38,5 @@ func GenerateEmptyHostsConfigFile() error {
 	})
 
 	// Save HostConfig array to hosts.config.json
-	return utils.SaveJSONFile(constants.HostsConfigFileName, hostsConfig)
+	return utils.SaveJSONFile("", constants.HostsConfigFileName, hostsConfig)
 }

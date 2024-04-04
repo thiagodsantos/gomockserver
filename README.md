@@ -47,7 +47,8 @@ At the root of the project, there should be two configuration files:
     "enable_graphql": true,
     "enable_rest": true,
     "generate_path": "/generate-files",
-    "graphql_path": "/graphql"
+    "graphql_path": "/graphql",
+    "output_folder:" "output"
   }
 ]
 ```
@@ -58,6 +59,7 @@ At the root of the project, there should be two configuration files:
 - **enable_rest**: Enables REST request
 - **graphql_path**: Path to use in GraphQL request
 - **generate_path**: Path to generate empty request and response files 
+- **output_folder**: Folder to store request and response files inside .output folder
 
 **Note**: The mock server supports only one enabled host. If more than one host is enabled, an error is thrown
 
@@ -82,5 +84,5 @@ When modifying the response file (created by mock server), the mock server will 
 - [x] Generate blank file
 - [x] GraphQL Support ![Beta](https://img.shields.io/badge/-Beta-orange)
 - [x] Docker Support ![Beta](https://img.shields.io/badge/-Beta-orange)
-- [ ] Request and response files in output folder (in server.cofig or by host.config)
+- [x] Request and response files in output folder
 - [ ] How it works in README

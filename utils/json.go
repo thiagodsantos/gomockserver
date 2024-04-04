@@ -3,6 +3,10 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
+
+	"github.com/thiagodsantos/gomockserver/constants"
 )
 
 // Read JSON file data from file
@@ -24,7 +28,7 @@ func ReadJSONFile(filename string, v interface{}) ([]byte, error) {
 	return data, nil
 }
 
-func SaveJSONFile(filename string, v interface{}) error {
+func SaveJSONFile(folder string, filename string, v interface{}) error {
 	// Encode JSON data
 	data, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
@@ -32,8 +36,21 @@ func SaveJSONFile(filename string, v interface{}) error {
 		return err
 	}
 
+	outputFolder := filepath.Join(constants.OutputFolder, folder)
+
+	if outputFolder != "" {
+		if _, err := os.Stat(outputFolder); os.IsNotExist(err) {
+			if err := os.MkdirAll(outputFolder, 0755); err != nil {
+				fmt.Println("Error creating folder:", err)
+				return err
+			}
+		}
+	}
+
+	outputFolder = filepath.Join(outputFolder, filename)
+
 	// Save JSON data to file
-	err = SaveFile(filename, data)
+	err = SaveFile(outputFolder, data)
 	if err != nil {
 		fmt.Println("Error writing JSON data to file:", err)
 		return err

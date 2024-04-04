@@ -15,6 +15,7 @@ type HostConfig struct {
 	EnableREST    bool   `json:"enable_rest"`
 	GeneratePath  string `json:"generate_path"`
 	GraphQLPath   string `json:"graphql_path"`
+	OutputFolder  string `json:"output_folder"`
 }
 
 func (h *HostConfig) GetHostURL(path string) (string, error) {

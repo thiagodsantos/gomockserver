@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/thiagodsantos/gomockserver/constants"
 	"github.com/thiagodsantos/gomockserver/structs"
@@ -13,18 +12,12 @@ import (
 )
 
 // Save response to file
-func SaveResponse(url string, response *http.Response, responseTime string, suffix string) (structs.Response, []byte, error) {
+func SaveResponse(url string, response *http.Response, responseTime string, suffix string, folder string) (structs.Response, []byte, error) {
 	// Read response body data from response
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println("Error reading response body:", err)
 		return structs.Response{}, nil, err
-	}
-
-	// Check if response content type is JSON
-	if !strings.Contains(response.Header.Get(constants.HeaderContentType), constants.JSONContentType) {
-		fmt.Println("Response content type allows only JSON format")
-		return structs.Response{}, nil, nil
 	}
 
 	// Decode response body to JSON format
@@ -42,7 +35,7 @@ func SaveResponse(url string, response *http.Response, responseTime string, suff
 
 	responseFilename := utils.FormatFilename(constants.ResponseFileName, url+suffix)
 
-	err = utils.SaveJSONFile(responseFilename, responseData)
+	err = utils.SaveJSONFile(folder, responseFilename, responseData)
 	if err != nil {
 		fmt.Println("Error saving response to file:", err)
 		return structs.Response{}, nil, err
@@ -52,7 +45,7 @@ func SaveResponse(url string, response *http.Response, responseTime string, suff
 	return responseData, responseBody, nil
 }
 
-func GenerateEmptyResponseFile(url string) error {
+func GenerateEmptyResponseFile(url string, folder string) error {
 	responseData := structs.Response{
 		URL:          url,
 		Method:       "",
@@ -63,7 +56,7 @@ func GenerateEmptyResponseFile(url string) error {
 	}
 	responseFilename := utils.FormatFilename(constants.ResponseFileName, url)
 
-	err := utils.SaveJSONFile(responseFilename, responseData)
+	err := utils.SaveJSONFile(folder, responseFilename, responseData)
 	if err != nil {
 		fmt.Println("Error saving empty response to file:", err)
 		return err

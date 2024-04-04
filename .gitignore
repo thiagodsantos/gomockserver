@@ -1,7 +1,5 @@
 .vscode
-
-request_*
-response_*
+.output
 
 hosts.config.json
 server.config.json

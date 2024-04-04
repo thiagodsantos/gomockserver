@@ -31,3 +31,8 @@ const (
 	ResponseFileName     = "response"
 	RequestFileName      = "request"
 )
+
+// Folder name constants
+const (
+	OutputFolder = ".output"
+)
