@@ -77,7 +77,7 @@ At the root of the project, there should be two configuration files:
 
 ## Mock responses
 
-When modifying the response file (created by mock server), the mock server will return the modified response, including status codes for error (4xx and 5xx).
+When modifying the response file (created by mock server), the mock server will return the modified response, including status codes for error (4xx and 5xx) and delay by reponse time
 
 ## TODO
 
