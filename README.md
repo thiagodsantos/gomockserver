@@ -48,7 +48,7 @@ At the root of the project, there should be two configuration files:
     "enable_rest": true,
     "generate_path": "/generate-files",
     "graphql_path": "/graphql",
-    "output_folder": "output"
+    "output_folder": "quotable"
   }
 ]
 ```
