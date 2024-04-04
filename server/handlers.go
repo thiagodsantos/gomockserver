@@ -92,7 +92,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Get mock response from file
-		responseFileJSON, statusCode, err := storage.GetMockResponse(hostURL, operationName)
+		responseFileJSON, statusCode, err := storage.GetMockResponse(hostURL, operationName, config.OutputFolder)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error getting mock response: %v", err), http.StatusInternalServerError)
 			return

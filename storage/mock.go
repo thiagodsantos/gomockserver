@@ -3,6 +3,8 @@ package storage
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
+	"time"
 
 	"github.com/thiagodsantos/gomockserver/constants"
 	"github.com/thiagodsantos/gomockserver/structs"
@@ -10,18 +12,20 @@ import (
 )
 
 // Get mock response from file
-func GetMockResponse(url string, operationName string) ([]byte, int, error) {
+func GetMockResponse(url string, operationName string, folder string) ([]byte, int, error) {
 	// Format filename with prefix and URL
 	responseFilename := utils.FormatFilename(constants.ResponseFileName, url+operationName)
 
+	outputFile := filepath.Join(constants.OutputFolder, folder, responseFilename)
+
 	// Check if file exists in current directory
-	if !utils.FileExists(responseFilename) {
+	if !utils.FileExists(outputFile) {
 		return defaultResponse()
 	}
 
 	var response structs.Response
 	// Read JSON file data from response_<url>.json
-	responseJSON, err := utils.ReadJSONFile(responseFilename, &response)
+	responseJSON, err := utils.ReadJSONFile(outputFile, &response)
 	if err != nil {
 		fmt.Println("Error reading mock:", err)
 		return nil, 500, err
@@ -37,6 +41,13 @@ func GetMockResponse(url string, operationName string) ([]byte, int, error) {
 		fmt.Println("Error encoding mock response to JSON:", err)
 		return nil, 500, err
 	}
+
+	duration, err := time.ParseDuration(response.ResponseTime)
+	if err != nil {
+		return responseFileJSON, response.StatusCode, nil
+	}
+
+	time.Sleep(duration)
 
 	return responseFileJSON, response.StatusCode, nil
 }
