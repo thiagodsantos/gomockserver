@@ -8,8 +8,8 @@ import (
 )
 
 func RESTHandler(r *http.Request, url string, requestBody []byte) (*http.Response, error) {
-	// Only allow GET and POST requests
-	if r.Method != constants.MethodGet && r.Method != constants.MethodPost {
+	// Only allow HTTP methods defined in constants
+	if !constants.HTTPMethods[r.Method] {
 		return nil, fmt.Errorf("method not allowed")
 	}
 
