@@ -61,6 +61,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Start timer for request
 	start := time.Now()
 
 	// Get host URL
@@ -113,7 +114,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Execute request (REST or GraphQL)
-	resp, err := Execute(w, r, config, hostURL, requestBody)
+	resp, err := Execute(r, config, hostURL, requestBody)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error executing request: %v", err), http.StatusInternalServerError)
 		return

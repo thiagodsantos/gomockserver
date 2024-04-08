@@ -10,27 +10,26 @@ import (
 	"github.com/thiagodsantos/gomockserver/structs"
 )
 
-func GetGraphQLRequestBody(w http.ResponseWriter, r *http.Request, reqBody []byte) (*structs.GraphQLRequest, error) {
-	var err error
-
+func GetGraphQLRequestBody(r *http.Request, reqBody []byte) (*structs.GraphQLRequest, error) {
 	// Only allow POST requests
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return nil, fmt.Errorf("method not allowed")
 	}
 
 	// Decode request body
 	var requestBody structs.GraphQLRequest
-	if err = json.Unmarshal(reqBody, &requestBody); err != nil {
-		http.Error(w, "Error decoding request body", http.StatusInternalServerError)
-		return nil, err
+	err := json.Unmarshal(reqBody, &requestBody)
+
+	// Return error when decoding request body fails
+	if err != nil {
+		return nil, fmt.Errorf("error decoding request body: %v", err)
 	}
 
 	return &requestBody, err
 }
 
 func GetOperationName(w http.ResponseWriter, r *http.Request, reqBody []byte) (string, error) {
-	requestBody, err := GetGraphQLRequestBody(w, r, reqBody)
+	requestBody, err := GetGraphQLRequestBody(r, reqBody)
 	if err != nil {
 		return "", err
 	}
@@ -43,14 +42,11 @@ func GetOperationName(w http.ResponseWriter, r *http.Request, reqBody []byte) (s
 	return operationName, nil
 }
 
-func GraphqlHandler(w http.ResponseWriter, r *http.Request, graphqlUrl string, reqBody []byte) (*http.Response, error) {
-	var err error
-
+func GraphqlHandler(r *http.Request, graphqlUrl string, reqBody []byte) (*http.Response, error) {
 	// Get GraphQL request body
-	requestBody, err := GetGraphQLRequestBody(w, r, reqBody)
+	requestBody, err := GetGraphQLRequestBody(r, reqBody)
 	if err != nil {
-		http.Error(w, "Error getting graphql request", http.StatusInternalServerError)
-		return nil, err
+		return nil, fmt.Errorf("error getting graphql request")
 	}
 
 	var reqJSON []byte
@@ -69,29 +65,28 @@ func GraphqlHandler(w http.ResponseWriter, r *http.Request, graphqlUrl string, r
 		})
 	}
 
+	// Return error when encoding request body fails
 	if err != nil {
-		fmt.Println("Error encoding request body:", err)
-		return nil, err
+		return nil, fmt.Errorf("error encoding request body: %v", err)
 	}
 
-	var req *http.Request
-
 	// Create HTTP request
-	req, err = http.NewRequest(constants.MethodPost, graphqlUrl, bytes.NewBuffer(reqJSON))
+	req, err := http.NewRequest(constants.MethodPost, graphqlUrl, bytes.NewBuffer(reqJSON))
 	if err != nil {
-		fmt.Println("Error creating graphql request:", err)
-		return nil, err
+		return nil, fmt.Errorf("error creating request: %v", err)
 	}
 	req.Header.Set(constants.HeaderContentType, constants.JSONContentType)
 
-	var resp *http.Response
-
 	// Make GraphQL request
-	client := &http.Client{}
+	var resp *http.Response
+	var client = &http.Client{}
+
+	// Make graphql request
 	resp, err = client.Do(req)
+
+	// Return error when request fails
 	if err != nil {
-		fmt.Println("Error making graphql request:", err)
-		return nil, err
+		return nil, fmt.Errorf("error making graphql request: %v", err)
 	}
 
 	return resp, err
