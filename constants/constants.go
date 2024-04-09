@@ -9,9 +9,18 @@ const (
 
 // HTTP constants
 const (
-	MethodGet  = "GET"
-	MethodPost = "POST"
+	MethodGet    = "GET"
+	MethodPost   = "POST"
+	MethodPut    = "PUT"
+	MethodDelete = "DELETE"
 )
+
+var HTTPMethods = map[string]bool{
+	MethodGet:    true,
+	MethodPost:   true,
+	MethodPut:    true,
+	MethodDelete: true,
+}
 
 // Header constants
 const (
