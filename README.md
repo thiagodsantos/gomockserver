@@ -66,14 +66,14 @@ At the root of the project, there should be two configuration files:
 ## Output Files
 
 ### REST
-- The request is saved in a file at the root. *Ex: request_\<url>.json*
-- The response is saved in a file at the root. *Ex: response_\<url>.json*
+- The request is saved in a file at the output folder. *Ex: request_\<url>.json*
+- The response is saved in a file at the output folder. *Ex: response_\<url>.json*
 
 ### GraphQL
-- The query is saved in a file at the root. *Ex: request_\<url>_query\<MD5>.json*
-- The mutation is saved in a file at the root. *Ex: request_\<url>_mutation\<MD5>.json*
-- The query response is saved in a file at the root. *Ex: response_\<url>_query\<MD5>.json*
-- The mutation response is saved in a file at the root. *Ex: response_\<url>_mutation\<MD5>.json*
+- The query is saved in a file at the output folder. *Ex: request_\<url>_query\<MD5>.json*
+- The mutation is saved in a file at the output folder. *Ex: request_\<url>_mutation\<MD5>.json*
+- The query response is saved in a file at the output folder. *Ex: response_\<url>_query\<MD5>.json*
+- The mutation response is saved in a file at the output folder. *Ex: response_\<url>_mutation\<MD5>.json*
 
 ## Mock responses
 
