@@ -1,5 +1,1 @@
-.vscode
-.output
-
-hosts.config.json
-server.config.json
+.output/

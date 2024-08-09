@@ -1,0 +1,8 @@
+{
+  "http://localhost:8001": {
+    "host": "https://viacep.com.br/",
+    "response_folder": "viacep",
+    "store": true,
+    "enabled": true
+  }
+}
